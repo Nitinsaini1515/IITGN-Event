@@ -1,30 +1,36 @@
 # Expense Management System
 
-*Automatically synced with your [v0.app](https://v0.app) deployments*
+Team Name : Code crafter
+Team Leader Name :Nitin saini
+Problem statement :Expense management
+Reviewer name:Aman Patel
+Video presentation link :
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/sachinsharma687433-7929s-projects/v0-expense-management-system)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/projects/BdAJziPzQ5G)
+This project is an Expense Management System built using React (TypeScript + JSX/TSX) for the frontend. The application provides role-based dashboards for Employees, Managers, and Admins. Employees can submit expenses, Managers can approve/reject them, and Admins can view analytics and reports.
 
-## Overview
+The frontend is designed with TailwindCSS for modern UI styling and responsiveness. Mock APIs and local state management have been used to simulate backend behavior (since no live backend was implemented for this version). The project structure follows a modular and scalable approach, ensuring readability and easy extension in the future.
 
-This repository will stay in sync with your deployed chats on [v0.app](https://v0.app).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.app](https://v0.app).
+🚀 Features Implemented
 
-## Deployment
+Role-based Dashboards (Employee, Manager, Admin)
+Expense Submission & Review (with mock API simulation)
+Analytics Dashboard with charts for expense tracking
+Filters & Sorting for better expense management
+Profile Page with editable mock user data
+Toast Notifications & Skeleton Loaders for better UX
+Clean Folder Structure (/components, /pages, /hooks, /utils, etc.)
 
-Your project is live at:
+🛠️ Tech Stack
 
-**[https://vercel.com/sachinsharma687433-7929s-projects/v0-expense-management-system](https://vercel.com/sachinsharma687433-7929s-projects/v0-expense-management-system)**
+Frontend Framework: React (with TypeScript, .tsx files)
+Styling: TailwindCSS
+Charts & Visualizations: Recharts / Chart.js
+State Management: Local State & Context API (with mock APIs)
+Routing: React Router
+UI Enhancements: react-hot-toast, loading skeletons
 
-## Build your app
-
-Continue building your app on:
-
-**[https://v0.app/chat/projects/BdAJziPzQ5G](https://v0.app/chat/projects/BdAJziPzQ5G)**
-
-## How It Works
-
-1. Create and modify your project using [v0.app](https://v0.app)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+🙌 Credits
+This project was built with the help of AI-assisted tools and modern frameworks. Special thanks to:
+Vercel v0 & v1 for frontend scaffolding and design assistance
+ChatGPT (OpenAI) for guidance and documentation support
+React, Tailwind, and Open-Source Libraries for powering the application
