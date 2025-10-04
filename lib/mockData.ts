@@ -23,6 +23,18 @@ export interface User {
   createdAt: string
 }
 
+export interface UserProfile {
+  id: string
+  name: string
+  email: string
+  role: "employee" | "manager" | "admin"
+  manager?: string
+  company: string
+  currency: string
+  phone?: string
+  department?: string
+}
+
 export interface WorkflowSettings {
   autoApproveThreshold: number
   requireManagerApproval: "always" | "threshold" | "never"
@@ -105,6 +117,82 @@ export const mockExpenses: Expense[] = [
     reviewedAt: "2025-01-10T10:30:00Z",
     reviewedBy: "Admin User",
   },
+  {
+    id: "exp-007",
+    employeeId: "user-001",
+    employeeName: "John Smith",
+    amount: 180.0,
+    category: "meals",
+    description: "Business dinner with clients",
+    date: "2025-01-09",
+    status: "approved",
+    submittedAt: "2025-01-09T20:00:00Z",
+    reviewedAt: "2025-01-09T21:30:00Z",
+    reviewedBy: "Sarah Johnson",
+  },
+  {
+    id: "exp-008",
+    employeeId: "user-003",
+    employeeName: "Sarah Johnson",
+    amount: 95.0,
+    category: "office",
+    description: "Printer paper and toner cartridges",
+    date: "2025-01-08",
+    status: "approved",
+    submittedAt: "2025-01-08T14:00:00Z",
+    reviewedAt: "2025-01-08T15:00:00Z",
+    reviewedBy: "Admin User",
+  },
+  {
+    id: "exp-009",
+    employeeId: "user-005",
+    employeeName: "Mike Davis",
+    amount: 540.0,
+    category: "travel",
+    description: "Hotel accommodation for 3 nights",
+    date: "2025-01-07",
+    status: "approved",
+    submittedAt: "2025-01-07T09:00:00Z",
+    reviewedAt: "2025-01-07T11:00:00Z",
+    reviewedBy: "Sarah Johnson",
+  },
+  {
+    id: "exp-010",
+    employeeId: "user-001",
+    employeeName: "John Smith",
+    amount: 65.0,
+    category: "meals",
+    description: "Working lunch with team",
+    date: "2025-01-06",
+    status: "rejected",
+    submittedAt: "2025-01-06T13:00:00Z",
+    reviewedAt: "2025-01-06T14:00:00Z",
+    reviewedBy: "Sarah Johnson",
+  },
+  {
+    id: "exp-011",
+    employeeId: "user-003",
+    employeeName: "Sarah Johnson",
+    amount: 220.0,
+    category: "equipment",
+    description: "Wireless headset for video calls",
+    date: "2025-01-05",
+    status: "approved",
+    submittedAt: "2025-01-05T10:00:00Z",
+    reviewedAt: "2025-01-05T12:00:00Z",
+    reviewedBy: "Admin User",
+  },
+  {
+    id: "exp-012",
+    employeeId: "user-005",
+    employeeName: "Mike Davis",
+    amount: 150.0,
+    category: "office",
+    description: "Desk organizer and filing cabinet",
+    date: "2025-01-04",
+    status: "pending",
+    submittedAt: "2025-01-04T11:00:00Z",
+  },
 ]
 
 // Mock users data
@@ -157,3 +245,48 @@ export const mockWorkflowSettings: WorkflowSettings = {
   requireManagerApproval: "always",
   approvalSequence: ["manager", "admin"],
 }
+
+export const mockUserProfiles: UserProfile[] = [
+  {
+    id: "user-001",
+    name: "John Smith",
+    email: "john@company.com",
+    role: "employee",
+    manager: "Sarah Johnson",
+    company: "Tech Corp",
+    currency: "USD",
+    phone: "+1 (555) 123-4567",
+    department: "Engineering",
+  },
+  {
+    id: "user-002",
+    name: "Sarah Johnson",
+    email: "sarah@company.com",
+    role: "manager",
+    company: "Tech Corp",
+    currency: "USD",
+    phone: "+1 (555) 234-5678",
+    department: "Engineering",
+  },
+  {
+    id: "user-003",
+    name: "Mike Davis",
+    email: "mike@company.com",
+    role: "employee",
+    manager: "Sarah Johnson",
+    company: "Tech Corp",
+    currency: "USD",
+    phone: "+1 (555) 345-6789",
+    department: "Sales",
+  },
+  {
+    id: "user-004",
+    name: "Emily Brown",
+    email: "emily@company.com",
+    role: "admin",
+    company: "Tech Corp",
+    currency: "USD",
+    phone: "+1 (555) 456-7890",
+    department: "Administration",
+  },
+]

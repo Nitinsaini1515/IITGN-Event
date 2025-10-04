@@ -1,7 +1,7 @@
 // Mock API functions with simulated network delays
 
-import { mockExpenses, mockUsers, mockWorkflowSettings } from "./mockData"
-import type { Expense, User, WorkflowSettings } from "./mockData"
+import { mockExpenses, mockUsers, mockWorkflowSettings, mockUserProfiles } from "./mockData"
+import type { Expense, User, WorkflowSettings, UserProfile } from "./mockData"
 
 // Simulate network delay
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -10,6 +10,7 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 let expenses = [...mockExpenses]
 let users = [...mockUsers]
 let workflowSettings = { ...mockWorkflowSettings }
+const userProfiles = [...mockUserProfiles]
 
 // Expense API
 export const expenseApi = {
@@ -179,6 +180,36 @@ export const workflowApi = {
       return { success: true, settings: workflowSettings }
     } catch (error) {
       return { success: false, error: "Failed to update workflow settings" }
+    }
+  },
+}
+
+// Profile API
+export const profileApi = {
+  // Get user profile by ID
+  getUserProfile: async (userId: string): Promise<UserProfile | null> => {
+    await delay(600)
+    return userProfiles.find((profile) => profile.id === userId) || null
+  },
+
+  // Update user profile
+  updateUserProfile: async (
+    userId: string,
+    profileData: Partial<UserProfile>,
+  ): Promise<{ success: boolean; profile?: UserProfile; error?: string }> => {
+    await delay(800)
+
+    try {
+      const profileIndex = userProfiles.findIndex((profile) => profile.id === userId)
+
+      if (profileIndex === -1) {
+        return { success: false, error: "Profile not found" }
+      }
+
+      userProfiles[profileIndex] = { ...userProfiles[profileIndex], ...profileData }
+      return { success: true, profile: userProfiles[profileIndex] }
+    } catch (error) {
+      return { success: false, error: "Failed to update profile" }
     }
   },
 }
