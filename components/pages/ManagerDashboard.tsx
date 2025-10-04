@@ -1,67 +1,82 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Card from "@/components/ui/Card"
 import Button from "@/components/ui/Button"
 import { Table, TableHeader, TableBody, TableRow, TableCell, TableHead } from "@/components/ui/Table"
+import { expenseApi } from "@/lib/mockApi"
+import type { Expense } from "@/lib/mockData"
 
 interface ManagerDashboardProps {
   onLogout: () => void
 }
 
-interface PendingExpense {
-  id: string
-  employeeName: string
-  amount: string
-  category: string
-  description: string
-  date: string
-  status: "pending"
-}
-
 export default function ManagerDashboard({ onLogout }: ManagerDashboardProps) {
-  // Mock data - in real app, this would be fetched from API
-  const [pendingExpenses, setPendingExpenses] = useState<PendingExpense[]>([
-    {
-      id: "1",
-      employeeName: "John Smith",
-      amount: "250.00",
-      category: "Travel",
-      description: "Client meeting transportation",
-      date: "2025-01-15",
-      status: "pending",
-    },
-    {
-      id: "2",
-      employeeName: "Sarah Johnson",
-      amount: "85.50",
-      category: "Meals",
-      description: "Team lunch",
-      date: "2025-01-14",
-      status: "pending",
-    },
-    {
-      id: "3",
-      employeeName: "Mike Davis",
-      amount: "450.00",
-      category: "Equipment",
-      description: "New keyboard and mouse",
-      date: "2025-01-13",
-      status: "pending",
-    },
-  ])
+  const [pendingExpenses, setPendingExpenses] = useState<Expense[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [processingId, setProcessingId] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleApprove = (id: string) => {
-    // Mock API call - in real app, this would PUT to backend
-    console.log("Approving expense:", id)
-    setPendingExpenses(pendingExpenses.filter((expense) => expense.id !== id))
+  useEffect(() => {
+    fetchPendingExpenses()
+  }, [])
+
+  const fetchPendingExpenses = async () => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const data = await expenseApi.getExpensesByStatus("pending")
+      setPendingExpenses(data)
+    } catch (err) {
+      setError("Failed to load pending expenses. Please try again.")
+      console.error("[v0] Error fetching pending expenses:", err)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const handleReject = (id: string) => {
-    // Mock API call - in real app, this would PUT to backend
-    console.log("Rejecting expense:", id)
-    setPendingExpenses(pendingExpenses.filter((expense) => expense.id !== id))
+  const handleApprove = async (id: string) => {
+    setProcessingId(id)
+    setError(null)
+
+    try {
+      const result = await expenseApi.updateExpenseStatus(id, "approved", "Sarah Johnson")
+
+      if (result.success) {
+        setPendingExpenses(pendingExpenses.filter((expense) => expense.id !== id))
+      } else {
+        setError(result.error || "Failed to approve expense")
+      }
+    } catch (err) {
+      setError("Failed to approve expense. Please try again.")
+      console.error("[v0] Error approving expense:", err)
+    } finally {
+      setProcessingId(null)
+    }
   }
+
+  const handleReject = async (id: string) => {
+    setProcessingId(id)
+    setError(null)
+
+    try {
+      const result = await expenseApi.updateExpenseStatus(id, "rejected", "Sarah Johnson")
+
+      if (result.success) {
+        setPendingExpenses(pendingExpenses.filter((expense) => expense.id !== id))
+      } else {
+        setError(result.error || "Failed to reject expense")
+      }
+    } catch (err) {
+      setError("Failed to reject expense. Please try again.")
+      console.error("[v0] Error rejecting expense:", err)
+    } finally {
+      setProcessingId(null)
+    }
+  }
+
+  const totalPendingAmount = pendingExpenses.reduce((sum, exp) => sum + exp.amount, 0)
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -77,6 +92,12 @@ export default function ManagerDashboard({ onLogout }: ManagerDashboardProps) {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-800 text-sm">{error}</p>
+          </div>
+        )}
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
@@ -88,9 +109,7 @@ export default function ManagerDashboard({ onLogout }: ManagerDashboardProps) {
           <Card>
             <div className="text-center">
               <p className="text-sm text-gray-600 mb-1">Total Amount</p>
-              <p className="text-3xl font-bold text-gray-900">
-                ${pendingExpenses.reduce((sum, exp) => sum + Number.parseFloat(exp.amount), 0).toFixed(2)}
-              </p>
+              <p className="text-3xl font-bold text-gray-900">${totalPendingAmount.toFixed(2)}</p>
             </div>
           </Card>
           <Card>
@@ -103,43 +122,60 @@ export default function ManagerDashboard({ onLogout }: ManagerDashboardProps) {
 
         {/* Pending Expenses Table */}
         <Card title="Pending Expense Approvals">
-          {pendingExpenses.length === 0 ? (
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <p className="mt-4 text-gray-600">Loading pending expenses...</p>
+            </div>
+          ) : pendingExpenses.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
               <p className="text-lg">No pending expenses</p>
               <p className="text-sm mt-2">All expenses have been reviewed</p>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableHead>Employee</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableHeader>
-              <TableBody>
-                {pendingExpenses.map((expense) => (
-                  <TableRow key={expense.id}>
-                    <TableCell className="font-medium">{expense.employeeName}</TableCell>
-                    <TableCell>${expense.amount}</TableCell>
-                    <TableCell className="capitalize">{expense.category}</TableCell>
-                    <TableCell className="max-w-xs truncate">{expense.description}</TableCell>
-                    <TableCell>{expense.date}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="primary" onClick={() => handleApprove(expense.id)}>
-                          Approve
-                        </Button>
-                        <Button size="sm" variant="danger" onClick={() => handleReject(expense.id)}>
-                          Reject
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableHead>Employee</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableHeader>
+                <TableBody>
+                  {pendingExpenses.map((expense) => (
+                    <TableRow key={expense.id}>
+                      <TableCell className="font-medium">{expense.employeeName}</TableCell>
+                      <TableCell>${expense.amount.toFixed(2)}</TableCell>
+                      <TableCell className="capitalize">{expense.category}</TableCell>
+                      <TableCell className="max-w-xs truncate">{expense.description}</TableCell>
+                      <TableCell>{expense.date}</TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="primary"
+                            onClick={() => handleApprove(expense.id)}
+                            disabled={processingId === expense.id}
+                          >
+                            {processingId === expense.id ? "..." : "Approve"}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="danger"
+                            onClick={() => handleReject(expense.id)}
+                            disabled={processingId === expense.id}
+                          >
+                            {processingId === expense.id ? "..." : "Reject"}
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </Card>
       </main>
